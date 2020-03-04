@@ -28,12 +28,12 @@ class Layer:
         print(self.weights.shape)
         print(self.forward_with_activation.shape)
         print(self.forward_gradient.shape)
-        self.backward_error = np.matmul((predict-true).transpose(), self.forward_gradient)
+        self.backward_error = (predict.transpose()-true.transpose()) * self.forward_gradient
         print(self.backward_error.shape)
 
     def backward_other_error(self, ekWk):
         self.forward_gradient = self.activation(self.forward_without_activation, gradient=True)
-        self.backward_error = np.matmul(ekWk.transpose(), self.forward_gradient)
+        self.backward_error = ekWk.transpose() * self.forward_gradient
         print(ekWk.shape)
         print(self.weights.shape)
         print(self.forward_with_activation.shape)
@@ -43,10 +43,14 @@ class Layer:
     def ekWk(self):
         print(self.n_input)
         print(self.n_output)
-        return np.matmul(self.backward_error, self.weights).transpose()
+        return np.matmul(self.backward_error.transpose(), self.weights)
 
     def update_weights_backward(self, previous_result):
-        self.delta_weights = - self.eta * np.matmul(self.backward_error, previous_result)
-        self.delta_bias = - self.eta * self.backward_error
+        print('error', self.backward_error.shape, ' previous', previous_result.shape)
+        self.delta_weights = - self.eta * np.matmul(self.backward_error, previous_result.transpose())
+        print(self.delta_weights.shape)
+        self.delta_bias = - self.eta * np.sum(self.backward_error)
+        print(self.weights.shape)
         self.weights = self.weights + self.delta_weights
+        print(self.weights.shape)
         self.bias = self.bias + self.delta_bias

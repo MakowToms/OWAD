@@ -19,22 +19,24 @@ class Network:
 
     def forward(self, x):
         self.results = []
+        x = x.transpose()
         for i in range(self.n_layers):
             x = self.layers[i].forward(x)
             self.results.append(x)
-        return x
+        return x.transpose()
 
     def backward(self, x, y):
         y_predict = self.forward(x)
-        self.layers[self.n_layers-1].backward_last_error(y, y_predict.transpose())
+        self.layers[self.n_layers-1].backward_last_error(y, y_predict)
         ekWk = self.layers[self.n_layers-1].ekWk()
         print(ekWk.shape)
         for i in range(self.n_layers-2, -1, -1):
             self.layers[i].backward_other_error(ekWk)
             ekWk = self.layers[i].ekWk()
             print(ekWk.shape)
-        for i in range(self.n_layers):
-            self.layers[i].update_weights_backward(self.results[i])
+        self.layers[0].update_weights_backward(x.transpose())
+        for i in range(1, self.n_layers):
+            self.layers[i].update_weights_backward(self.results[i-1])
 
     def set_weights_and_bias(self, weights_list, bias_list):
         for i in range(len(weights_list)):
