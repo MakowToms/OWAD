@@ -9,35 +9,28 @@ train = train[1:, 1:]
 test = genfromtxt('mio1/regression/square-simple-test.csv', delimiter=',')
 test = test[1:, 1:]
 
+
 def normalize(X):
     return (X-np.mean(X, 0))/np.std(X, 0)
+
+
+def MSE(x, y):
+    return np.mean(x - y) ** 2
+
 
 train = normalize(train)
 
 x = train[:, 0:1]
 y = train[:, 1:2]
-x = x.transpose()
-y = y.transpose()
 
-simple_square = Network(1, [5], 1, [sigmoid, linear])
-# simple_square.backward(x[:1, :1], y[:1, :1])
+simple_square = Network(1, [1], 1, [sigmoid, linear])
 
-for i in range(y.shape[1]):
-    simple_square.backward(x[:1, i:i+1], y[:1, i:i+1])
+plt.figure()
+plt.plot(x[:, 0], y[:, 0], 'bo')
 
-a = simple_square.layers[0].backward_error
-b = simple_square.layers[0].weights
-np.matmul(a, b.transpose())
+for i in range(10000):
+    res = simple_square.forward(x)
+    print('Iteracja {0}, MSE: {1:0.4f}'.format(i, MSE(res, y)))
+    simple_square.backward(x, y)
 
-simple_square.layers[1].backward_error
-
-simple_square.layers[0].weights
-simple_square.layers[0].bias
-
-def MSE(x, y):
-    return np.mean(x - y) ** 2
-plt.plot(x[0, :], y[0, :], 'bo')
-res = simple_square.forward(x)
-print(MSE(res, y))
-plt.plot(x[0, :], res[0, :], 'bo')
-
+plt.plot(x[:, 0], res[:, 0], 'bo')

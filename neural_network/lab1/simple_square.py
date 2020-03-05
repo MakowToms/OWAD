@@ -18,8 +18,8 @@ test = test[1:, 1:]
 
 x = train[:, 0:1]
 y = train[:, 1:2]
-x = x.transpose()
-y = y.transpose()
+# x = x.transpose()
+# y = y.transpose()
 
 # fig = plt.figure()
 plt.plot(x[0, :], y[0, :], 'bo')
