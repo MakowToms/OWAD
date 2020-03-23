@@ -9,7 +9,7 @@ def sigmoid(x, gradient=False):
 
 def linear(x, gradient=False):
     if gradient:
-        return x/x
+        return np.ones(x.shape)
     return x
 
 
