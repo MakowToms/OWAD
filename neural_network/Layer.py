@@ -1,4 +1,5 @@
 import numpy as np
+from neural_network.activations import softmax
 
 
 class Layer:
@@ -34,7 +35,15 @@ class Layer:
 
     def backward_last_error(self, true, predict):
         self.__forward_gradient__()
-        self.backward_error = (predict.transpose()-true.transpose()) * self.forward_gradient
+        if self.activation == softmax:
+            ez = np.e ** self.forward_without_activation
+            sum_ez = np.sum(ez, axis=0)
+            diag = sum_ez * ez / (sum_ez) ** 2
+            self.backward_error = (predict.transpose()-true.transpose()) * diag
+            for i in range(self.forward_without_activation.shape[0]):
+                self.backward_error += (predict.transpose()-true.transpose()) * self.forward_gradient * self.forward_without_activation[i, :]
+        else:
+            self.backward_error = (predict.transpose() - true.transpose()) * self.forward_gradient
 
     def backward_other_error(self, ekWk):
         self.__forward_gradient__()
