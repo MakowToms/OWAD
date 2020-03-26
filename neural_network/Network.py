@@ -33,6 +33,7 @@ class Network:
             for i in range(n_batches):
                 self.backward_batch(x[i*batch_size:(i+1)*batch_size, :], y[i*batch_size:(i+1)*batch_size, :], eta, lambda_momentum, beta, moment_type)
 
+    # one batch of backward propagation
     def backward_batch(self, x, y, eta, lambda_momentum, beta, moment_type):
         y_predict = self.forward(x)
         self.layers[self.n_layers-1].backward_last_error(y, y_predict)
@@ -46,6 +47,7 @@ class Network:
         for i in range(1, self.n_layers):
             self.layers[i].update_weights_and_bias_backward(self.results[i - 1], eta, lambda_momentum, beta, moment_type)
 
+    # set weights and biases on your own - not generated with one of default functions
     def set_weights_and_bias(self, weights_list, bias_list):
         for i in range(len(weights_list)):
             self.layers[i].weights = weights_list[i]
@@ -54,7 +56,6 @@ class Network:
 
     @staticmethod
     def __shuffle__(x, y):
-        # TODO check if work for bigger matrices
         s = np.arange(x.shape[0])
         np.random.shuffle(s)
         return x[s], y[s]

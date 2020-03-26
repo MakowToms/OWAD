@@ -18,13 +18,13 @@ class Layer:
             self.weights = np.zeros([out, inp])
             self.bias = np.zeros([1, out]).transpose()
         elif initialize_weights == 'norm':
-            self.weights_from_normal(inp, out)
+            self.weights_from_normal_distribution(inp, out)
         elif initialize_weights == 'Xavier':
-            self.weights_from_normal(inp, out)
+            self.weights_from_normal_distribution(inp, out)
             self.weights = self.weights * np.sqrt(6) / np.sqrt(self.n_input + self.n_output)
             self.bias = self.bias * np.sqrt(6) / np.sqrt(self.n_input + self.n_output)
 
-    def weights_from_normal(self, inp, out):
+    def weights_from_normal_distribution(self, inp, out):
         self.weights = np.random.rand(out, inp) - (np.ones([out, inp]) * 1 / 2)
         self.bias = np.random.rand(1, out).transpose() - (np.ones([1, out]).transpose() * 1 / 2)
 
@@ -33,18 +33,26 @@ class Layer:
         self.forward_with_activation = self.activation(self.forward_without_activation)
         return self.forward_with_activation
 
+    # error in last layer
     def backward_last_error(self, true, predict):
         self.__forward_gradient__()
+        # special case for computing backward error for softmax function
         if self.activation == softmax:
+            # to compute gradient we need e^x where x is the multiplication of input for the layer and weights
             ez = np.e ** self.forward_without_activation
+            # for each record computed in single batch we need to sum all ez values
             sum_ez = np.sum(ez, axis=0)
-            diag = sum_ez * ez / (sum_ez) ** 2
-            self.backward_error = (predict.transpose()-true.transpose()) * diag
+            # now we compute gradient which comes from numerator of softmax function
+            main_gradient = sum_ez * ez / (sum_ez) ** 2
+            # we initialize backward error with main gradient times difference between true value and prediction
+            self.backward_error = (predict.transpose()-true.transpose()) * main_gradient
+            # for each output neuron we add error which comes from denominator of softmax function
             for i in range(self.forward_without_activation.shape[0]):
-                self.backward_error += (predict.transpose()-true.transpose()) * self.forward_gradient * self.forward_without_activation[i, :]
+                self.backward_error[i, :] += np.sum((predict.transpose()-true.transpose()) * self.forward_gradient, axis=0) * ez[i, :]
         else:
             self.backward_error = (predict.transpose() - true.transpose()) * self.forward_gradient
 
+    # error in other than last layer
     def backward_other_error(self, ekWk):
         self.__forward_gradient__()
         self.backward_error = ekWk.transpose() * self.forward_gradient
@@ -52,13 +60,16 @@ class Layer:
     def __forward_gradient__(self):
         self.forward_gradient = self.activation(self.forward_without_activation, gradient=True)
 
+    # compute error times weights for this layer to use in backward propagation in previous layer
     def ekWk(self):
         return self.backward_error.transpose() @ self.weights
 
     def update_weights_and_bias_backward(self, previous_result, eta, lambda_momentum, beta, moment_type):
+        # compute learning rate and delta bias and delta weights
         learning_rate = - eta
         delta_weights = self.backward_error @ previous_result.transpose()
         delta_bias = np.sum(self.backward_error)
+        # update weights and bias based on type of momentum used
         if moment_type == 'normal':
             self.weights = self.weights + learning_rate * delta_weights
             self.bias = self.bias + learning_rate * delta_bias

@@ -7,6 +7,8 @@ def normalize(X):
     return (X-np.mean(X, 0))/np.std(X, 0)
 
 
+# only one case to use this function - data easy (classification)
+# because numpy don't support strings
 def load_easy_data(normalization=True):
     train = load_data_with_true_false('mio1/' + 'classification' + '/' + 'easy' + '-training.csv')
     test = load_data_with_true_false('mio1/' + 'classification' + '/' + 'easy' + '-test.csv')
@@ -16,6 +18,8 @@ def load_easy_data(normalization=True):
     return train, test
 
 
+# only one case to use this function - data easy (classification)
+# because numpy don't support strings
 def load_data_with_true_false(file_name):
     df = pd.read_csv(file_name)
     the_column_should_not_be_in_data = df.iloc[:, 2]
@@ -25,6 +29,7 @@ def load_data_with_true_false(file_name):
     return np.array(df)
 
 
+# load typical data as numpy arrays
 def load_data(file_name, folder='regression', normalization=True, classification=False):
     train = genfromtxt('mio1/' + folder + '/' + file_name + '-training.csv', delimiter=',')
     if not classification:
