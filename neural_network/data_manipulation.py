@@ -1,6 +1,5 @@
 from numpy import genfromtxt
 from neural_network.activations import *
-import matplotlib.pyplot as plt
 import pandas as pd
 
 
@@ -45,16 +44,6 @@ def load_data(file_name, folder='regression', normalization=True, classification
             train[:, :-1] = normalize(train[:, :-1])
             test[:, :-1] = normalize(test[:, :-1])
     return train, test
-
-
-def plot(x, y, colors):
-    plt.figure()
-    uniques = np.unique(colors)
-    different_colors = ['r', 'g', 'b', 'y', 'o', 'c', 'k']
-    for index, unique in enumerate(uniques):
-        indexes = colors == unique
-        plt.plot(x[indexes], y[indexes], different_colors[index] + 'o')
-    plt.show()
 
 
 def one_hot_encode(y):
