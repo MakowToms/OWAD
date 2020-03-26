@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 from neural_network.Network import Network
 from neural_network.activations import *
-from neural_network.loading_data import load_data
+from neural_network.data_manipulation import load_data
 from neural_network.testing_model import MSE
 
 train, test = load_data('square-simple')

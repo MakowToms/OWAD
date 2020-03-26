@@ -1,31 +1,17 @@
-from neural_network.Network import Network
 from neural_network.activations import *
-from neural_network.loading_data import load_data, plot, one_hot_encode
-from neural_network.testing_model import accuracy
+from neural_network.data_manipulation import load_data
+from neural_network.plots import plot_data_2d
+from neural_network.learn_network import learn_network
 
 # load dataset
-train, test = load_data(file_name='rings3-balance', folder='classification', classification=True)
-
+train, test = load_data(file_name='rings3-regular', folder='classification', classification=True)
 
 x = train[:, 0:2]
 y = train[:, 2:3]
-y_numeric = y
-# plot(x[:, 0], x[:, 1], y[:, 0])
-y = one_hot_encode(y)
 
-# learn network without any momentum technique
-network = Network(2, [50, 50], 3, [sigmoid, sigmoid, softmax], initialize_weights='Xavier')
-mse = []
-res = network.forward(x)
-res = np.argmax(res, axis=1)
-mse.append(accuracy(res, y_numeric))
-for i in range(100):
-    network.backward(x, y, eta=0.01, epochs=1, beta=0.01, moment_type='RMSProp')
-    res = network.forward(x)
-    res = np.argmax(res, axis=1)
-    print('Iteracja {0}, Accuracy: {1:0.8f}'.format(i, accuracy(res, y_numeric)))
-    mse.append(accuracy(res, y_numeric))
+# plot data classes
+plot_data_2d(x[:, 0], x[:, 1], y[:, 0])
 
-print('accuracy: ', accuracy(res, y_numeric))
-plot(x[:, 0], x[:, 1], res)
+# learn model and plot result classes
+mse_rms = learn_network(x, y, [50, 50], [sigmoid, sigmoid, softmax], beta=0.01, eta=0.01, epochs=1, iterations=100, regression=False)
 
