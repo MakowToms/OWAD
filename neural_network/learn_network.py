@@ -6,7 +6,7 @@ from neural_network.plots import plot_data_1d, plot_data_2d
 
 
 # function to create network, learn, return error and plot prediction
-def learn_network(x, y, hidden_layers, activations, initialize_weights='Xavier', momentum_type='RMSProp', lambda_momentum=0.9, beta=0.01, eta=0.01, epochs=1, iterations=20, regression=True):
+def learn_network(x, y, hidden_layers, activations, initialize_weights='Xavier', momentum_type='RMSProp', lambda_momentum=0.9, beta=0.01, eta=0.01, epochs=1, iterations=20, regression=True, plot_title=None, return_result=False, plot=True):
     # for classification problem we need one hot encoded y
     if regression:
         y_numeric = -1
@@ -41,11 +41,20 @@ def learn_network(x, y, hidden_layers, activations, initialize_weights='Xavier',
         print('Iteration {0}, {1}: {2:0.8f}'.format(i, measure_name, errors[-1]))
 
     # plot data after all training
-    if regression:
-        plot_data_1d(x, y, res)
-    else:
-        res = np.argmax(res, axis=1)
-        plot_data_2d(x[:, 0], x[:, 1], res, title='Predicted classes of points on the plane')
+    if plot:
+        if regression:
+            if plot_title is not None:
+                plot_data_1d(x, y, res, title=plot_title)
+            else:
+                plot_data_1d(x, y, res)
+        else:
+            res = np.argmax(res, axis=1)
+            if plot_title is not None:
+                plot_data_2d(x[:, 0], x[:, 1], res, title=plot_title)
+            else:
+                plot_data_2d(x[:, 0], x[:, 1], res, title='Predicted classes of points on the plane')
+    if return_result:
+        return errors, res
     return errors
 
 

@@ -28,3 +28,17 @@ def softmax(x, gradient=False):
         # it returns base to compute all gradient
         return - np.e**x / (np.sum(np.e**x, axis=0) ** 2)
     return np.e**x / np.sum(np.e**x, axis=0)
+
+
+def tanh(x, gradient=False):
+    e2x = (np.e ** (2*x))
+    if gradient:
+        return (4 * e2x) / ((e2x + 1) ** 2)
+    return (e2x - 1) / (e2x + 1)
+
+
+def ReLU(x, gradient=False):
+    if gradient:
+        return np.maximum(np.sign(x) * x / x, 0)
+    return np.maximum(x, 0)
+
