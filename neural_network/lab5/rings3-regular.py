@@ -13,10 +13,21 @@ y = train[:, 2:3]
 # plot data classes
 plot_data_2d(x[:, 0], x[:, 1], y[:, 0], title='True classes of points on the plane')
 
-# learn model and plot result classes
-mse_linear = learn_network(x, y, [50, 50], [linear, linear, softmax], beta=0.01, eta=0.01, epochs=1, iterations=1000, regression=False, plot_title="Prediction with linear activation function")
-mse_ReLU = learn_network(x, y, [50, 50], [ReLU, ReLU, softmax], beta=0.01, eta=0.01, epochs=1, iterations=1000, regression=False, plot_title="Prediction with ReLU activation function")
-mse_sigmoid = learn_network(x, y, [50, 50], [sigmoid, sigmoid, softmax], beta=0.01, eta=0.01, epochs=1, iterations=1000, regression=False, plot_title="Prediction with sigmoid activation function")
-mse_tanh = learn_network(x, y, [50, 50], [tanh, tanh, softmax], beta=0.01, eta=0.01, epochs=1, iterations=1000, regression=False, plot_title="Prediction with tanh activation function")
+neurons = [50, 50, 50]
 
-plot_measure_results_data([mse_linear, mse_ReLU, mse_sigmoid, mse_tanh], labels=['linear', 'ReLU', 'sigmoid', 'tanh'])
+# learn model and plot result classes
+for i in range(1, 4):
+    mse_linear = learn_network(x, y, neurons[:i], [linear] * i + [softmax], beta=0.01, eta=0.01, epochs=1, iterations=1000, regression=False, plot_title="Prediction with linear activation function and " + str(i) + " hidden layers")
+    mse_ReLU = learn_network(x, y, neurons[:i], [ReLU] * i + [softmax], beta=0.01, eta=0.01, epochs=1, iterations=1000, regression=False, plot_title="Prediction with ReLU activation function and " + str(i) + " hidden layers")
+    mse_sigmoid = learn_network(x, y, neurons[:i], [sigmoid] * i + [softmax], beta=0.01, eta=0.01, epochs=1, iterations=1000, regression=False, plot_title="Prediction with sigmoid activation function and " + str(i) + " hidden layers")
+    mse_tanh = learn_network(x, y, neurons[:i], [tanh] * i + [softmax], beta=0.01, eta=0.01, epochs=1, iterations=1000, regression=False, plot_title="Prediction with tanh activation function and " + str(i) + " hidden layers")
+
+    plot_measure_results_data([mse_linear, mse_ReLU, mse_sigmoid, mse_tanh], labels=['linear', 'ReLU', 'sigmoid', 'tanh'], title_base="accuracy", title_ending=" for " + str(i) + " layers networks")
+
+# Results (more than in rings5-regular / not reapiting the same)
+# ReLU is the fastest algorithm to learn (is quite good after some iterations)
+# sigmoid is slowest to learn but can achieve really good results
+# tanh is usually little bit slower than relu and is more stable
+
+# * fastest / slowest means number of epochs to achieve result
+
