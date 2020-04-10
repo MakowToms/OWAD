@@ -6,7 +6,7 @@ from neural_network.plots import plot_data_1d, plot_data_2d
 
 
 # function to create network, learn, return error and plot prediction
-def learn_network(x, y, hidden_layers, activations, initialize_weights='Xavier', momentum_type='RMSProp', lambda_momentum=0.9, beta=0.01, eta=0.01, epochs=1, iterations=20, regression=True, plot_title=None, return_result=False, plot=True):
+def learn_network(x, y, hidden_layers, activations, initialize_weights='Xavier', momentum_type='RMSProp', lambda_momentum=0.9, beta=0.01, eta=0.01, epochs=1, iterations=20, regularization_lambda=0, regression=True, plot_title=None, return_result=False, plot=True):
     # for classification problem we need one hot encoded y
     if regression:
         y_numeric = -1
@@ -28,11 +28,11 @@ def learn_network(x, y, hidden_layers, activations, initialize_weights='Xavier',
     for i in range(iterations):
         # train network (with backward propagation) depends on type of training (nothing, momentum, RMSProp)
         if momentum_type == 'normal':
-            network.backward(x, y, eta=eta, epochs=epochs)
+            network.backward(x, y, eta=eta, epochs=epochs, regularization_lambda=regularization_lambda)
         if momentum_type == 'momentum':
-            network.backward(x, y, eta=eta, epochs=epochs, lambda_momentum=lambda_momentum, moment_type='momentum')
+            network.backward(x, y, eta=eta, epochs=epochs, regularization_lambda=regularization_lambda, lambda_momentum=lambda_momentum, moment_type='momentum')
         if momentum_type == 'RMSProp':
-            network.backward(x, y, eta=eta, epochs=epochs, beta=beta, moment_type='RMSProp')
+            network.backward(x, y, eta=eta, epochs=epochs, regularization_lambda=regularization_lambda, beta=beta, moment_type='RMSProp')
 
         # predict and save error after i*epochs epochs
         res = network.forward(x)

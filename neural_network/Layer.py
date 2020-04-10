@@ -60,15 +60,22 @@ class Layer:
     def __forward_gradient__(self):
         self.forward_gradient = self.activation(self.forward_without_activation, gradient=True)
 
+    def L2_regularization(self, regularization_lambda):
+        self.regularization = regularization_lambda * self.weights
+
     # compute error times weights for this layer to use in backward propagation in previous layer
     def ekWk(self):
         return self.backward_error.transpose() @ self.weights
 
-    def update_weights_and_bias_backward(self, previous_result, eta, lambda_momentum, beta, moment_type):
+    def update_weights_and_bias_backward(self, previous_result, eta, lambda_momentum, beta, moment_type, regularization_lambda):
         # compute learning rate and delta bias and delta weights
         learning_rate = - eta
         delta_weights = self.backward_error @ previous_result.transpose()
         delta_bias = np.sum(self.backward_error)
+        # if use regularization:
+        if regularization_lambda != 0:
+            self.L2_regularization(regularization_lambda)
+            delta_weights += self.regularization
         # update weights and bias based on type of momentum used
         if moment_type == 'normal':
             self.weights = self.weights + learning_rate * delta_weights
