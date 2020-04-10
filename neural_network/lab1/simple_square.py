@@ -1,48 +1,41 @@
-from numpy import genfromtxt
 import matplotlib.pyplot as plt
 
 from neural_network.Network import Network
 from neural_network.activations import *
 
+from neural_network.data_manipulation import load_data
+from neural_network.testing_model import MSE
 
-def MSE(x, y):
-    return np.mean(x - y) ** 2
-
-
-# simple square
-
-train = genfromtxt('mio1/regression/square-simple-training.csv', delimiter=',')
-train = train[1:, 1:]
-test = genfromtxt('mio1/regression/square-simple-test.csv', delimiter=',')
-test = test[1:, 1:]
+train, test = load_data('square-simple')
 
 x = train[:, 0:1]
 y = train[:, 1:2]
-# x = x.transpose()
-# y = y.transpose()
-
-# fig = plt.figure()
-plt.plot(x[0, :], y[0, :], 'bo')
 
 # base architecture
-
 simple_square = Network(1, [5], 1, [sigmoid, linear])
 res = simple_square.forward(x)
 print(MSE(res, y))
 
-simple_square.set_weights_and_bias([np.array([[5], [-2], [1], [1], [1]]), np.array([[1, 1, 1, 1, 1]])], [np.array([[1], [0], [0], [0], [1]]), np.array([[1]])])
+simple_square.set_weights_and_bias([np.array([[15], [5], [10], [-8], [-10]]), np.array([[1.5, -0.5, 2, -0.8, 2]])], [np.array([[-12], [1], [-15], [1], [-15]]), np.array([[0]])])
 res = simple_square.forward(x)
 print(MSE(res, y))
-plt.plot(x[0, :], res[0, :], 'bo')
+plt.plot(x, y, 'bo')
+plt.plot(x, res, 'ro')
+plt.title("Neural network with weights and bias written by hand")
+plt.legend(["true", "predicted"])
+plt.xlabel('observed values')
+plt.ylabel('result values')
+plt.savefig("lab1_simple-square.png")
+plt.show()
 
-# other architectures
+# other architectures - works
 
-simple_square2 = Network(1, [10], 1, [sigmoid, linear])
-res = simple_square2.forward(x)
-print(MSE(res, y))
-
-simple_square3 = Network(1, [5, 5], 1, [sigmoid, sigmoid, linear])
-res = simple_square3.forward(x)
-print(MSE(res, y))
+# simple_square2 = Network(1, [10], 1, [sigmoid, linear])
+# res = simple_square2.forward(x)
+# print(MSE(res, y))
+#
+# simple_square3 = Network(1, [5, 5], 1, [sigmoid, sigmoid, linear])
+# res = simple_square3.forward(x)
+# print(MSE(res, y))
 
 
