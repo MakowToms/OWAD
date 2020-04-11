@@ -20,10 +20,11 @@ def plot_data_2d(x, y, colors, title='Points on the plane', ylabel='y', xlabel='
 
 
 # plot which shows mse or accuracy
-def plot_measure_results_data(errors, title_base='MSE', title_ending=' through epochs', labels=["base model", "momentum model", "RMSProp model"], colors=['red', 'green', 'blue', 'yellow'], xlabel='epochs', ylabel='MSE'):
+def plot_measure_results_data(errors, title_base='MSE', title_ending=' through epochs', labels=["base model", "momentum model", "RMSProp model"], colors=['red', 'green', 'blue', 'yellow'], xlabel='epochs', ylabel='MSE', from_error=0):
     plt.figure()
+    n = len(errors[0])
     for i in range(len(errors)):
-        plt.plot(errors[i], color=colors[i])
+        plt.plot([i for i in range(from_error, n)], errors[i][from_error:], color=colors[i])
     plt.legend(labels=labels)
     plt.title(title_base + title_ending)
     plt.xlabel(xlabel)

@@ -18,13 +18,13 @@ class Layer:
             self.weights = np.zeros([out, inp])
             self.bias = np.zeros([1, out]).transpose()
         elif initialize_weights == 'norm':
-            self.weights_from_normal_distribution(inp, out)
+            self.weights_from_uniform_distribution(inp, out)
         elif initialize_weights == 'Xavier':
-            self.weights_from_normal_distribution(inp, out)
+            self.weights_from_uniform_distribution(inp, out)
             self.weights = self.weights * np.sqrt(6) / np.sqrt(self.n_input + self.n_output)
             self.bias = self.bias * np.sqrt(6) / np.sqrt(self.n_input + self.n_output)
 
-    def weights_from_normal_distribution(self, inp, out):
+    def weights_from_uniform_distribution(self, inp, out):
         self.weights = np.random.rand(out, inp) - (np.ones([out, inp]) * 1 / 2)
         self.bias = np.random.rand(1, out).transpose() - (np.ones([1, out]).transpose() * 1 / 2)
 
