@@ -43,7 +43,7 @@ class Layer:
             # for each record computed in single batch we need to sum all ez values
             sum_ez = np.sum(ez, axis=0)
             # now we compute gradient which comes from numerator of softmax function
-            main_gradient = sum_ez * ez / (sum_ez) ** 2
+            main_gradient = sum_ez * ez / sum_ez / sum_ez
             # we initialize backward error with main gradient times difference between true value and prediction
             self.backward_error = (predict.transpose()-true.transpose()) * main_gradient
             # for each output neuron we add error which comes from denominator of softmax function
@@ -63,18 +63,24 @@ class Layer:
     def L2_regularization(self, regularization_lambda):
         self.regularization = regularization_lambda * self.weights
 
+    def L1_regularization(self, regularization_lambda):
+        self.regularization = regularization_lambda
+
     # compute error times weights for this layer to use in backward propagation in previous layer
     def ekWk(self):
         return self.backward_error.transpose() @ self.weights
 
-    def update_weights_and_bias_backward(self, previous_result, eta, lambda_momentum, beta, moment_type, regularization_lambda):
+    def update_weights_and_bias_backward(self, previous_result, eta, lambda_momentum, beta, moment_type, regularization_lambda, regularization_type):
         # compute learning rate and delta bias and delta weights
         learning_rate = - eta
         delta_weights = self.backward_error @ previous_result.transpose()
         delta_bias = np.sum(self.backward_error)
         # if use regularization:
         if regularization_lambda != 0:
-            self.L2_regularization(regularization_lambda)
+            if regularization_type == "L1":
+                self.L1_regularization(regularization_lambda)
+            else:
+                self.L2_regularization(regularization_lambda)
             delta_weights += self.regularization
         # update weights and bias based on type of momentum used
         if moment_type == 'normal':

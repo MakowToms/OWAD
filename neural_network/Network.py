@@ -26,26 +26,26 @@ class Network:
             self.results.append(x)
         return x.transpose()
 
-    def backward(self, x, y, eta=0.001, batch_size=50, epochs=1, lambda_momentum=0.5, beta=0.5, moment_type='normal', regularization_lambda=0):
+    def backward(self, x, y, eta=0.001, batch_size=50, epochs=1, lambda_momentum=0.5, beta=0.5, moment_type='normal', regularization_lambda=0, regularization_type="L2"):
         n_batches = math.ceil(x.shape[0]/batch_size)
         for j in range(epochs):
             x, y = self.__shuffle__(x, y)
             for i in range(n_batches):
-                self.backward_batch(x[i*batch_size:(i+1)*batch_size, :], y[i*batch_size:(i+1)*batch_size, :], eta, lambda_momentum, beta, moment_type, regularization_lambda)
+                self.backward_batch(x[i*batch_size:(i+1)*batch_size, :], y[i*batch_size:(i+1)*batch_size, :], eta, lambda_momentum, beta, moment_type, regularization_lambda, regularization_type)
 
     # one batch of backward propagation
-    def backward_batch(self, x, y, eta, lambda_momentum, beta, moment_type, regularization_lambda):
+    def backward_batch(self, x, y, eta, lambda_momentum, beta, moment_type, regularization_lambda, regularization_type):
         y_predict = self.forward(x)
         self.layers[self.n_layers-1].backward_last_error(y, y_predict)
         for i in range(self.n_layers-2, -1, -1):
             ekWk = self.layers[i+1].ekWk()
             self.layers[i].backward_other_error(ekWk)
-        self.update_weights_and_bias_backward(x, eta, lambda_momentum, beta, moment_type, regularization_lambda)
+        self.update_weights_and_bias_backward(x, eta, lambda_momentum, beta, moment_type, regularization_lambda, regularization_type)
 
-    def update_weights_and_bias_backward(self, x, eta, lambda_momentum, beta, moment_type, regularization_lambda):
-        self.layers[0].update_weights_and_bias_backward(x.transpose(), eta, lambda_momentum, beta, moment_type, regularization_lambda)
+    def update_weights_and_bias_backward(self, x, eta, lambda_momentum, beta, moment_type, regularization_lambda, regularization_type):
+        self.layers[0].update_weights_and_bias_backward(x.transpose(), eta, lambda_momentum, beta, moment_type, regularization_lambda, regularization_type)
         for i in range(1, self.n_layers):
-            self.layers[i].update_weights_and_bias_backward(self.results[i - 1], eta, lambda_momentum, beta, moment_type, regularization_lambda)
+            self.layers[i].update_weights_and_bias_backward(self.results[i - 1], eta, lambda_momentum, beta, moment_type, regularization_lambda, regularization_type)
 
     # set weights and biases on your own - not generated with one of default functions
     def set_weights_and_bias(self, weights_list, bias_list):

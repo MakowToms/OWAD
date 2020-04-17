@@ -26,7 +26,8 @@ def softmax(x, gradient=False):
         # tensor 3d by tensor 2d in a way that is needed
         #
         # it returns base to compute all gradient
-        return - np.e**x / (np.sum(np.e**x, axis=0) ** 2)
+        divide_by = (np.sum(np.e**x, axis=0))
+        return - np.e**x / divide_by / divide_by
     return np.e**x / np.sum(np.e**x, axis=0)
 
 
