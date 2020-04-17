@@ -6,7 +6,7 @@ from neural_network.plots import plot_data_1d, plot_data_2d
 
 
 # function to create network, learn, return error and plot prediction
-def learn_network(x, y, hidden_layers, activations, initialize_weights='norm', momentum_type='RMSProp', lambda_momentum=0.9, beta=0.01, eta=0.01, epochs=1, batch_size=32, iterations=20, regularization_lambda=0, regression=True, plot_title=None, return_result=False, plot=True):
+def learn_network(x, y, hidden_layers, activations, initialize_weights='norm', momentum_type='RMSProp', lambda_momentum=0.9, beta=0.01, eta=0.01, epochs=1, batch_size=32, iterations=20, regularization_lambda=0, regression=True, plot_title=None, return_result=False, plot=True, plot_show=True, ):
     # for classification problem we need one hot encoded y
     if regression:
         y_numeric = -1
@@ -50,9 +50,9 @@ def learn_network(x, y, hidden_layers, activations, initialize_weights='norm', m
         else:
             res = np.argmax(res, axis=1)
             if plot_title is not None:
-                plot_data_2d(x[:, 0], x[:, 1], res, title=plot_title)
+                plot_data_2d(x[:, 0], x[:, 1], res, title=plot_title, show=plot_show)
             else:
-                plot_data_2d(x[:, 0], x[:, 1], res, title='Predicted classes of points on the plane')
+                plot_data_2d(x[:, 0], x[:, 1], res, title='Predicted classes of points on the plane', show=plot_show)
     if return_result:
         return errors, res
     return errors
