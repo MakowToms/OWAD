@@ -4,7 +4,7 @@ from kohonen.plot import plot_point_map
 
 data, classes = load_data("hexagon")
 
-network = Kohonen(15, 15, 2, neighbour_param=0.8, distance_type="gauss", lambd=1)
+network = Kohonen(15, 15, 2, neighbour_param=0.8, distance_type="gauss", t=1)
 network.learn_epochs(data, epochs=50)
 plot_point_map(data, classes, network, ['Class 0', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'], colors=['r', 'g', 'b', 'y', 'c', 'k'])
 

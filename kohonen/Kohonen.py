@@ -50,7 +50,7 @@ class Kohonen:
                np.exp(- ((distances * self.neighbour_param) ** 2))
 
     def alpha_t(self):
-        return np.exp(- self.t / self.lambd)
+        return np.exp(self.t / self.lambd)
 
     def update_weights(self, point, index_point):
         if self.distance_type == "gauss":
@@ -71,7 +71,7 @@ class Kohonen:
 
     def learn_epochs(self, x, epochs=10):
         for i in range(1, epochs+1):
-            self.t = i
+            self.lambd = i
             self.learn_epoch(x)
 
     @staticmethod
