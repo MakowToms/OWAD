@@ -5,7 +5,7 @@ import numpy as np
 # visualization of 2d data
 def plot_data_2d(x, y, colors, title='Points on the plane', ylabel='y', xlabel='x', show=True):
     uniques = np.unique(colors)
-    different_colors = ['r', 'g', 'b', 'y', 'c', 'k']
+    different_colors = ['r', 'g', 'b', 'y', 'c', 'k', 'm', 'w']
     labels = []
     for index, unique in enumerate(uniques):
         indexes = colors == unique

@@ -1,24 +1,31 @@
 from kohonen.data_manipulation import load_data
 from kohonen.Kohonen import Kohonen
-from kohonen.plot import plot_point_map
+import matplotlib.pyplot as plt
+from neural_network.plots import plot_data_2d
 
+# load data
 data, classes = load_data("hexagon")
 
-network = Kohonen(15, 15, 2, neighbour_param=0.8, distance_type="gauss", t=1)
-network.learn_epochs(data, epochs=50)
-plot_point_map(data, classes, network, ['Class 0', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'], colors=['r', 'g', 'b', 'y', 'c', 'k'])
+# Gauss
+# create network
+network = Kohonen(5, 5, 2, neighbour_param=0.2, distance_type="gauss")
+network.learn_epochs(data, epochs=10)
 
-# network.weights[:, :, 1]
-#
-# from neural_network.plots import plot_data_2d
-# plot_data_2d(data[:, :1], data[:, 1:], classes)
+# plot network
+plot_data_2d(data[:, :1], data[:, 1:], classes, show=False, title="Hexagon dataset, Gauss metric")
+network.plot_weights()
+plt.show()
 
-#Mexican hat
-network = Kohonen(15, 15, 2, neighbour_param=0.8, distance_type="not_gauss_(its_enough)", t=1)
-network.learn_epochs(data, epochs=50)
-plot_point_map(data, classes, network, ['Class 0', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'], colors=['r', 'g', 'b', 'y', 'c', 'k'])
+# Mexican hat
+# create network
+network = Kohonen(5, 5, 2, neighbour_param=0.015, distance_type="mexican")
+network.learn_epochs(data, epochs=10)
 
+# plot network
+plot_data_2d(data[:, :1], data[:, 1:], classes, show=False, title="Hexagon dataset, Mexican hat metric")
+network.plot_weights()
+plt.show()
 
-network = Kohonen(10, 10, 2, neighbour_param=0.1, distance_type="not_gauss_(its_enough)", t=0.01)
-network.learn_epochs(data, epochs=50)
-plot_point_map(data, classes, network, ['Class 0', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'], colors=['r', 'g', 'b', 'y', 'c', 'k'])
+# Results:
+# it is really hard to train Kohonen using mexican hat metric,
+# the neighbour param has to be really low
