@@ -29,3 +29,9 @@ plt.show()
 # Results:
 # it is really hard to train Kohonen using mexican hat metric,
 # the neighbour param has to be really low
+
+# Also in mexican hat the network is usually
+# too small or too big in compare to dataset
+
+# Gauss network looks good and it is not as hard to put good parameters
+# Many values return nice looking network

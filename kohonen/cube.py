@@ -26,3 +26,6 @@ network.learn_epochs(data, epochs=10)
 plot_data_2d(data[:, :1], data[:, 1:], classes, show=False, title="Cube dataset, Mexican hat metric")
 network.plot_weights()
 plt.show()
+
+# Results:
+# Mainly the same as in hexagon, but in 3d it is harder to see it
