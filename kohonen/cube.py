@@ -2,9 +2,13 @@ from kohonen.data_manipulation import load_data
 from kohonen.Kohonen import Kohonen
 import matplotlib.pyplot as plt
 from neural_network.plots import plot_data_2d
+from kohonen.train import find_epochs_and_neighbour
 
 # load data
 data, classes = load_data("cube")
+
+find_epochs_and_neighbour(data, classes, 5, 5, [5, 10, 20], [0.1, 0.2, 0.5, 1], use_pca=True)
+find_epochs_and_neighbour(data, classes, 5, 5, [5, 10, 20], [0.005, 0.01, 0.015, 0.03], distance_type="mexican", use_pca=True)
 
 # Gauss
 # create network
