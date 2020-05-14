@@ -4,7 +4,7 @@ import math
 '''
 The base genetic algorithm
 With crossing population in one point
-With gauss mutation
+With gauss mutation for some percent of population
 Evaluation by eval_function
 And choosing best 50% of population to next population
 Old population is left
@@ -12,12 +12,13 @@ New population is made iteratively by choosing to random parents and random cros
 Possibility to change any of above points or add more methods
 '''
 class Genetic:
-    def __init__(self, n, n_gens, eval_function, mutation_coef=0.1):
+    def __init__(self, n, n_gens, eval_function, mutation_coef=1, mutation_percentage=0.2):
         self.n = n
         self.n_gens = n_gens
         self.population = self.generate_base_population()
         self.eval_function = eval_function
         self.mutation_coef = mutation_coef
+        self.mutation_percentage = mutation_percentage
 
     def generate_base_population(self):
         return np.random.normal(0, 1, [self.n, self.n_gens])
@@ -27,7 +28,11 @@ class Genetic:
             self.population += self.mutation_coef * self.gauss_mutation()
 
     def gauss_mutation(self):
-        return np.random.normal(0, 1, [self.n, self.n_gens])
+        mutation = np.zeros([self.n, self.n_gens])
+        n_mutated = int(self.n*self.mutation_percentage)
+        observations_mutated = np.random.choice(np.linspace(0, self.n-1, self.n, dtype=np.int), n_mutated)
+        mutation[observations_mutated, :] = np.random.standard_normal([n_mutated, self.n_gens])
+        return mutation
 
     def cross_population(self, best_population):
         n_best = best_population.shape[0]

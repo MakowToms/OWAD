@@ -8,18 +8,18 @@ def eval_function(population):
 
 
 # create genetic class
-gen = Genetic(1000, 3, eval_function)
+gen = Genetic(1000, 3, eval_function, mutation_coef=1)
 # set base population to quite big values
 gen.population = 10 * np.ones([1000, 3])
 
 # learn 100 epochs and then see results
-# the population has weights around 1 in each genom so much less
-gen.learn_population(epochs=100)
-print("After 100 epochs")
+# the population has weights definitely less than 1 in each genom so much less
+gen.learn_population(epochs=50)
+print("After 50 epochs")
 print(f'some values in population: {gen.population}')
 print(f'Mean of absolute value in each genom {np.mean(np.abs(gen.population), axis=0)} \n')
 
-# learn 10 epochs more and see results
+# learn 10 epochs more and see results -- nothing change
 gen.learn_population(epochs=10)
 print("After 10 epochs")
 print(f'some values in population: {gen.population}')

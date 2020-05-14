@@ -16,7 +16,7 @@ gen = Genetic(1000, 5, eval_function)
 gen.population = 2 * np.random.standard_normal([1000, 5])
 
 # learn 100 epochs and then see results
-gen.learn_population(epochs=100)
+gen.learn_population(epochs=50)
 print("After 100 epochs")
 print(f'some values in population: {gen.population}')
 print(f'Mean of absolute value in each genom {np.mean(np.abs(gen.population), axis=0)} \n')
