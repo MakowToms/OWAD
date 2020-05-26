@@ -4,6 +4,30 @@ import numpy as np
 from neural_network.plots import plot_measure_results_data
 
 
+"""
+Polish description:
+
+ Rozwiazanie opiera sie na podziale kola na poziome paski. 
+ Nastepnie paski zapelniane sa zachlannie zaczynajac od prostokata, 
+ ktory da najwiekszy wzrost na jedna jednostke szerokosci paska.
+
+Gen ciagly koduje jak wysoko zaczyna sie "pierwszy" gorny pasek - 
+jest to liczba od 0 do najwiekszego wymiaru sposrod dostepnych prostokatow (
+dla r=800 jest to 400). Geny dyskretne koduja, jaka wysokosc maja 
+kolejne paski (paski stykaja sie ze soba). 
+Dla r=800 dostepne wartosci to 30, ..., 400, zatem 1 koduje wysokosc 30, 
+a 7 koduje wysokosc 400. Pierwsze floor(r/30) koduje wielkosci paskow
+na gornej czesci, a nastepne floor((r+400)/30) koduje wielkosci paskow 
+w dolnej czesci. Oczywiscie bardzo czesto ostatnie geny z obu "polowek" 
+nie sa uzywane poniewaz wymagaja konkretnych wartosci w innych genach.
+
+Mutacja to dodanie liczb do genow z rozkladem normalnym. 
+Dla genow dyskretnych jest to wartosc calkowita zatem bardzo wiele genow 
+nie mutuje - co jest raczej dobre (bo zmiany we wczesniejszych genach 
+maja duzy wplyw na ewaluacje nastepnych genow).
+
+Krzyzowanie jest to krzyzowanie jednopunktowe, gdzie gen ciagly jest 
+brany z pierwszego wybranego osobnika."""
 class CuttingStock:
     def __init__(self, r, file_name, n=1000, mutation_percentage=0.2, file_directory="genetic/data/cutting/"):
         self.rectangles, unique_sizes, self.best_rectangle_score_per_unit = CuttingStock.read_data(file_directory, file_name)
@@ -139,7 +163,6 @@ class CuttingStock:
             score += rectangle[0] * rectangle[1] * math.floor(smaller_width/rectangle[1])
             smaller_width -= math.floor(smaller_width/rectangle[1]) * rectangle[1]
         if return_area:
-            # print(area, smaller_width)
             return score, area * height, (area-smaller_width) * height
         return score
 
@@ -170,13 +193,19 @@ class CuttingStock:
         return rectangles, unique_sizes, best_rectangle_score_per_unit
 
 
+# all area means area of the strips - can be used by rectangles
+# area means the area used by rectangles but it is not the area of rectangles:
+# why? example:
+# if on the strip of height 100 and width 1000 there is a rectangle of height 80 and width 900
+# all area = 100 * 1000
+# area = 100 * 900 (used)
+# area of rectangle = 80 * 900
 Ascores, Aall_areas, Aareas, labels = [], [], [], []
 for r in [800, 850, 1000, 1100, 1200]:
     labels.append(f'R = {r}')
     cut = CuttingStock(r, "r" + str(r) + ".csv")
     circle = r*r*math.pi
     indexes = np.argsort(cut.evaluate())
-    print(cut.__evaluate_one__(indexes[0], return_area=True))
     scores, all_areas, areas = [], [], []
     for i in range(50):
         cut.learn_population(1)
@@ -192,4 +221,4 @@ for r in [800, 850, 1000, 1100, 1200]:
 
 plot_measure_results_data(Aall_areas, title_base="Possible area percent ", labels=labels, ylabel="Percent")
 plot_measure_results_data(Aareas, title_base="Used area percent ", labels=labels, ylabel="Percent")
-plot_measure_results_data(Ascores, title_base="Score ", labels=labels, ylabel="Score")
+plot_measure_results_data(Ascores, title_base="Score ", labels=labels, ylabel="Score normalized")
