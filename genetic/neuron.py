@@ -32,9 +32,28 @@ class NeuronContainer:
         self.possible_neurons[new_id] = new_neuron
         return new_id
 
-    def create_new_neuron_on_connection(self, connection_id):
-        connection = self.connection_container[connection_id]
-        return self.create_new_neuron(NeuronType.hidden)
+    def create_new_neuron_on_connection(self, connection_id, neuron_ids):
+        connection = self.connection_container.possible_connections[connection_id]
+        from_node = connection.from_node
+        to_node = connection.to_node
+        connections_from = self.connection_container.get_by_from_node(from_node)
+        connections_to = self.connection_container.get_by_to_node(to_node)
+        unique_endings_of_connections = {v for k, v in connections_from.items()}
+        unique_begins_of_connections = {v for k, v in connections_to.items()}
+        both = unique_begins_of_connections.intersection(unique_endings_of_connections)
+        for both_elem in both:
+            if not neuron_ids.__contains__(both_elem):
+                # it means that it don't have to create new neuron, but use this neuron
+                connection_to_both = [k for k, v in connections_from.items() if v == both_elem][0]
+                connection_from_both = [k for k, v in connections_to.items() if v == both_elem][0]
+                return both_elem, connection_to_both, connection_from_both
+        # create neuron and create new connections
+        new_neuron = self.create_new_neuron(NeuronType.hidden)
+        connection_to_new = self.connection_container\
+            .create_new_connection_between_nodes_if_not_exist(from_node, new_neuron)
+        connection_from_new = self.connection_container\
+            .create_new_connection_between_nodes_if_not_exist(new_neuron, to_node)
+        return new_neuron, connection_to_new, connection_from_new
 
 
 class Neuron:

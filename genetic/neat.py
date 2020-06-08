@@ -24,45 +24,44 @@ class NEAT:
     def get_best_population(self):
         results = np.zeros([self.n])
         for index, pop in enumerate(self.population):
-            results[index] = pop.score(self.data)
-        print(f'Best accuracy: {results.max()}')
+            results[index] = pop.score(copy.deepcopy(self.data))
+        print(f'Best accuracy: {results.max():0.03}')
         best_pop = results.argsort()[::-1]
-        return best_pop[:int(self.n/2)]
+        return best_pop
 
     def epoch(self):
         new_population_index = self.get_best_population()
-        copied_population = copy.deepcopy(self.population)
+        copied_population = self.copy_population()
+
         new_population = []
-        for i in new_population_index:
-            new_population.append(self.population[i])
-            if np.random.random(1) > 0.2:
-                new_population[-1].mutate_weight()
-        for i in new_population_index:
+
+        # copy last best 10% of population
+        for i in new_population_index[:int(self.n/10)]:
+            new_population.append(copied_population[i])
+
+        # mutate best 50% of population
+        copied_population = self.copy_population()
+        for i in new_population_index[:int(self.n*5/10)]:
             new_population.append(copied_population[i])
             if np.random.random(1) > 0.2:
                 new_population[-1].mutate_weight()
+            if np.random.random(1) > 0.95:
+                new_population[-1].mutate_connection()
+            if np.random.random(1) > 0.97:
+                new_population[-1].mutate_neuron()
+            if np.random.random(1) > 0.97:
+                new_population[-1].mutate_activation()
+
+        # cross best 40% of population
+        copied_population = self.copy_population()
+        for i in new_population_index[:int(self.n*4/10)]:
+            new_random = np.random.choice(new_population_index[:int(self.n*4/10)], 1)[0]
+            new_population.append(copied_population[i].cross(copied_population[new_random]))
+
         self.population = new_population
 
-
-# trying on easy data
-
-from neural_network.data_manipulation import load_easy_data
-train, test = load_easy_data(True)
-
-
-# create score function for easy
-def score_function(res):
-    return (np.sum(np.logical_and(res[2] > 0.5, train[:, 2] == 1)) +\
-    np.sum(np.logical_and(res[2] <= 0.5, train[:, 2] == 0))) / res[2].shape[0]
-
-
-data = {0: train[:, 0], 1: train[:, 1]}
-
-# initialize neat wth 10 population size
-neat = NEAT(2, 1, 10, score_function, data)
-# results = neat.get_best_population()
-
-# train
-for i in range(100):
-    neat.epoch()
-# after around 20 epochs there is around 0.97 accuracy
+    def copy_population(self):
+        new_population = []
+        for pop in self.population:
+            new_population.append(Network(copy.deepcopy(pop.neuron_ids), copy.deepcopy(pop.connection_ids), self.neurons, self.connections, self.score_function, copy.deepcopy(pop.connection_data)))
+        return new_population
