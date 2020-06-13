@@ -63,3 +63,7 @@ class Genetic:
         for i in range(epochs):
             self.__learn_population_epoch__()
 
+    def get_best(self):
+        values = self.evaluate()
+        indexes = np.argsort(values)
+        return values[indexes[0]], self.population[indexes[0]]

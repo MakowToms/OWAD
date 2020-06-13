@@ -191,34 +191,3 @@ class CuttingStock:
             unique_sizes.add(data.iloc[i, 1])
         unique_sizes = sorted(list(unique_sizes))
         return rectangles, unique_sizes, best_rectangle_score_per_unit
-
-
-# all area means area of the strips - can be used by rectangles
-# area means the area used by rectangles but it is not the area of rectangles:
-# why? example:
-# if on the strip of height 100 and width 1000 there is a rectangle of height 80 and width 900
-# all area = 100 * 1000
-# area = 100 * 900 (used)
-# area of rectangle = 80 * 900
-Ascores, Aall_areas, Aareas, labels = [], [], [], []
-for r in [800, 850, 1000, 1100, 1200]:
-    labels.append(f'R = {r}')
-    cut = CuttingStock(r, "r" + str(r) + ".csv")
-    circle = r*r*math.pi
-    indexes = np.argsort(cut.evaluate())
-    scores, all_areas, areas = [], [], []
-    for i in range(50):
-        cut.learn_population(1)
-        indexes = np.argsort(cut.evaluate())
-        res = cut.__evaluate_one__(indexes[0], return_area=True)
-        scores.append(res[0] / cut.best_rectangle_score_per_unit)
-        all_areas.append(res[1]/circle)
-        areas.append(res[2]/circle)
-        # print(f'Result {res[0]}, found_area {res[1]/circle}, used_area {res[2]/circle}')
-    Ascores.append(scores)
-    Aall_areas.append(all_areas)
-    Aareas.append(areas)
-
-plot_measure_results_data(Aall_areas, title_base="Possible area percent ", labels=labels, ylabel="Percent")
-plot_measure_results_data(Aareas, title_base="Used area percent ", labels=labels, ylabel="Percent")
-plot_measure_results_data(Ascores, title_base="Score ", labels=labels, ylabel="Score normalized")

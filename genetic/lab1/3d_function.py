@@ -1,4 +1,5 @@
 from genetic.Genetic import Genetic
+from neural_network.plots import plot_measure_results_data
 import numpy as np
 
 
@@ -7,29 +8,47 @@ def eval_function(population):
     return (population[:, 0] ** 2) + (population[:, 1] ** 2) + 2 * (population[:, 2] ** 2)
 
 
-# create genetic class
-gen = Genetic(1000, 3, eval_function, mutation_coef=1)
-# set base population to quite big values
-gen.population = 10 * np.ones([1000, 3])
+mses0 = []
+population_size = [100, 200, 500, 1000]
+for size in population_size:
+    best_results = []
+    gen = Genetic(size, 3, eval_function, mutation_coef=1, mutation_percentage=0.2)
+    for i in range(100):
+        gen.learn_population(epochs=1)
+        best_results.append(gen.get_best()[0])
+    mses0.append(best_results)
+    print(f'Ended {size}')
 
-# learn 100 epochs and then see results
-# the population has weights definitely less than 1 in each genom so much less
-gen.learn_population(epochs=50)
-print("After 50 epochs")
-print(f'some values in population: {gen.population}')
-print(f'Mean of absolute value in each genom {np.mean(np.abs(gen.population), axis=0)} \n')
+mses1 = []
+mutation_percentages = [0.05, 0.1, 0.2, 0.3]
+for mutation_percentage in mutation_percentages:
+    best_results = []
+    gen = Genetic(500, 3, eval_function, mutation_coef=1, mutation_percentage=mutation_percentage)
+    for i in range(100):
+        gen.learn_population(epochs=1)
+        best_results.append(gen.get_best()[0])
+    mses1.append(best_results)
+    print(f'Ended {mutation_percentage}')
 
-# learn 10 epochs more and see results -- nothing change
-gen.learn_population(epochs=10)
-print("After 10 epochs")
-print(f'some values in population: {gen.population}')
-print(f'Mean of absolute value in each genom {np.mean(np.abs(gen.population), axis=0)} \n')
+mses2 = []
+mutation_coefs = [0.1, 0.2, 0.5, 1]
+for mutation_coef in mutation_coefs:
+    best_results = []
+    gen = Genetic(500, 3, eval_function, mutation_coef=mutation_coef, mutation_percentage=0.1)
+    for i in range(100):
+        gen.learn_population(epochs=1)
+        best_results.append(gen.get_best()[0])
+    mses2.append(best_results)
+    print(f'Ended {mutation_coef}')
 
-# set mutation coefficient to less value (the gauss mutation will be less aggressive)
-gen.mutation_coef = 0.05
-gen.learn_population(epochs=10)
-print("After setting mutation_coef to less (0.5) and 10 epochs")
-print(f'some values in population: {gen.population}')
-print(f'Mean of absolute value in each genom {np.mean(np.abs(gen.population), axis=0)} \n')
+# plot results
+title = "Function value "
+y_label = "Logarithm of function value "
+labels = ["Population size = " + str(val) for val in population_size]
+plot_measure_results_data(mses0, title_base=title, ylabel=y_label, labels=labels, from_error=0, y_log=True)
 
-# so the algorithm works well without any big problems
+labels = ["Mutation percentage = " + str(val) for val in mutation_percentages]
+plot_measure_results_data(mses1, title_base=title, ylabel=y_label, labels=labels, from_error=0, y_log=True)
+
+labels = ["Mutation coefficient = " + str(val) for val in mutation_coefs]
+plot_measure_results_data(mses2, title_base=title, ylabel=y_label, labels=labels, from_error=0, y_log=True)
