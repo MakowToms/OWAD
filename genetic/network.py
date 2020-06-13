@@ -47,12 +47,15 @@ class Network:
                 done_neurons[neuron_id] = neurons_to_propagate[neuron_id]
         return done_neurons
 
-    def score(self, data):
+    def score(self, data, type="score"):
         try:
-            result = self.score_function(self.evaluate(data))
+            if type == "score":
+                result = self.score_function(self.evaluate(data))
+            else:
+                result = self.score_function(self.evaluate(data), type="accuracy")
         except:
-            print("\n\nNot suceed\n\n")
-            result = 0
+            print("Not suceed")
+            result = -np.inf
         return result
 
     def initialize_connections(self):
